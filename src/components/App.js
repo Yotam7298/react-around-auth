@@ -1,16 +1,26 @@
+//React imports
 import React from "react";
+import { Route, Switch } from "react-router-dom";
+//Components Imports
 import Header from "./Header";
+import SignUp from "./Authorization/SignUp";
+import SignIn from "./Authorization/SignIn";
 import Main from "./Main";
 import Footer from "./Footer";
-import EditProfilePopup from "./EditProfilePopup";
-import EditAvatarPopup from "./EditAvatarPopup";
-import AddCardPopup from "./AddPlacePopup";
-import DeleteCardPopup from "./DeleteCardPopup";
-import ImagePopup from "./ImagePopup";
-import api from "../utils/api";
+//Popups imports
+import EditProfilePopup from "./Popups/EditProfilePopup";
+import EditAvatarPopup from "./Popups/EditAvatarPopup";
+import AddCardPopup from "./Popups/AddPlacePopup";
+import DeleteCardPopup from "./Popups/DeleteCardPopup";
+import ImagePopup from "./Popups/ImagePopup";
+import MessagePopup from "./Popups/MessagePopup";
+//Contexts imports
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import CardsContext from "../contexts/CardsContext";
 import LoadingFormContext from "../contexts/LoadingFormContext";
+//API import
+import api from "../utils/api";
+//CSS import
 import "../index.css";
 
 function App() {
@@ -87,62 +97,72 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <CardsContext.Provider value={cards}>
         <LoadingFormContext.Provider value={isLoading}>
-          <div className="page">
-            {/* Main page content */}
-            <Header />
-            <Main
-              onEditProfileClick={handleEditProfileClick}
-              onAddPlaceClick={handleAddPlaceClick}
-              onEditAvatarClick={handleEditAvatarClick}
-              onCardClick={setSelectedCard}
-              onCardDelete={setDeletedCard}
-              updateCards={setCards}
-              likeRequest={api.changeCardLike.bind(api)}
-              cardsRequest={api.loadCards.bind(api)}
-              requestError={api.reportError.bind(api)}
-            />
-            <Footer />
+          <Switch>
+            <div className="page">
+              {/* Main page content */}
+              <MessagePopup isMessageOpen={true} success={true} />
+              <Header />
+              <Route path="/signup">
+                <SignUp />
+              </Route>
+              <Route path="/signin">
+                <SignIn />
+              </Route>
 
-            {/* Popups */}
-            <EditProfilePopup
-              isOpen={isEditProfilePopupOpen}
-              onClose={closeAllPopups}
-              updateUser={setCurrentUser}
-              setLoadingState={setIsLoading}
-              submitRequest={api.editProfileInfo.bind(api)}
-              requestError={api.reportError.bind(api)}
-            />
-            <EditAvatarPopup
-              isOpen={isEditAvatarPopupOpen}
-              onClose={closeAllPopups}
-              updateUser={setCurrentUser}
-              updateCards={setCards}
-              setLoadingState={setIsLoading}
-              submitRequest={api.editProfileAvatar.bind(api)}
-              requestError={api.reportError.bind(api)}
-            />
-            <AddCardPopup
-              isOpen={isAddCardPopupOpen}
-              onClose={closeAllPopups}
-              updateCards={setCards}
-              setLoadingState={setIsLoading}
-              submitRequest={api.addNewCard.bind(api)}
-              requestError={api.reportError.bind(api)}
-            />
-            <DeleteCardPopup
-              deletedCard={deletedCard}
-              onClose={closeAllPopups}
-              updateCards={setCards}
-              setLoadingState={setIsLoading}
-              submitRequest={api.deleteCard.bind(api)}
-              requestError={api.reportError.bind(api)}
-            />
-            <ImagePopup
-              name="image"
-              card={selectedCard}
-              onClose={closeAllPopups}
-            />
-          </div>
+              <Main
+                onEditProfileClick={handleEditProfileClick}
+                onAddPlaceClick={handleAddPlaceClick}
+                onEditAvatarClick={handleEditAvatarClick}
+                onCardClick={setSelectedCard}
+                onCardDelete={setDeletedCard}
+                updateCards={setCards}
+                likeRequest={api.changeCardLike.bind(api)}
+                cardsRequest={api.loadCards.bind(api)}
+                requestError={api.reportError.bind(api)}
+              />
+              <Footer />
+
+              {/* Popups */}
+              <EditProfilePopup
+                isOpen={isEditProfilePopupOpen}
+                onClose={closeAllPopups}
+                updateUser={setCurrentUser}
+                setLoadingState={setIsLoading}
+                submitRequest={api.editProfileInfo.bind(api)}
+                requestError={api.reportError.bind(api)}
+              />
+              <EditAvatarPopup
+                isOpen={isEditAvatarPopupOpen}
+                onClose={closeAllPopups}
+                updateUser={setCurrentUser}
+                updateCards={setCards}
+                setLoadingState={setIsLoading}
+                submitRequest={api.editProfileAvatar.bind(api)}
+                requestError={api.reportError.bind(api)}
+              />
+              <AddCardPopup
+                isOpen={isAddCardPopupOpen}
+                onClose={closeAllPopups}
+                updateCards={setCards}
+                setLoadingState={setIsLoading}
+                submitRequest={api.addNewCard.bind(api)}
+                requestError={api.reportError.bind(api)}
+              />
+              <DeleteCardPopup
+                deletedCard={deletedCard}
+                onClose={closeAllPopups}
+                updateCards={setCards}
+                setLoadingState={setIsLoading}
+                submitRequest={api.deleteCard.bind(api)}
+                requestError={api.reportError.bind(api)}
+              />
+              <ImagePopup
+                name="image"
+                card={selectedCard}
+                onClose={closeAllPopups}
+              />
+            </div>
+          </Switch>
         </LoadingFormContext.Provider>
       </CardsContext.Provider>
     </CurrentUserContext.Provider>

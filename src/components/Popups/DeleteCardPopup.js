@@ -1,7 +1,7 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
-import CardsContext from "../contexts/CardsContext";
-import LoadingFormContext from "../contexts/LoadingFormContext";
+import CardsContext from "../../contexts/CardsContext";
+import LoadingFormContext from "../../contexts/LoadingFormContext";
 
 export default function DeleteCardPopup(props) {
   const cards = React.useContext(CardsContext);

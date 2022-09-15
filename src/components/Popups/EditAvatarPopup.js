@@ -1,8 +1,8 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
-import CurrentUserContext from "../contexts/CurrentUserContext";
-import LoadingFormContext from "../contexts/LoadingFormContext";
-import useFormValidation from "../hooks/formValidatorHook";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
+import LoadingFormContext from "../../contexts/LoadingFormContext";
+import useFormValidation from "../../hooks/formValidatorHook";
 
 export default function EditAvatarPopup(props) {
   const currentUser = React.useContext(CurrentUserContext);

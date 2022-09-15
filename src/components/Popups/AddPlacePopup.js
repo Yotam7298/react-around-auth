@@ -1,8 +1,8 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
-import CardsContext from "../contexts/CardsContext";
-import LoadingFormContext from "../contexts/LoadingFormContext";
-import useFormValidation from "../hooks/formValidatorHook";
+import CardsContext from "../../contexts/CardsContext";
+import LoadingFormContext from "../../contexts/LoadingFormContext";
+import useFormValidation from "../../hooks/formValidatorHook";
 
 export default function AddCardPopup(props) {
   const cards = React.useContext(CardsContext);

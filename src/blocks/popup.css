@@ -59,6 +59,25 @@
     calc(22px + 14 * ((100vw - 320px) / 960));
 }
 
+.popup__message-container {
+  margin: 50px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.popup__message {
+  font-family: Inter, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  text-align: center;
+  margin-top: 32px;
+}
+
+.popup__image {
+  width: 120px;
+}
+
 .popup__button {
   background-color: black;
   background-position: center;

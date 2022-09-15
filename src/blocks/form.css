@@ -44,12 +44,7 @@
   color: red;
   align-self: flex-start;
   align-self: center;
-  /* display: none; */
 }
-/* 
-.form__input-error_active {
-  display: block;
-} */
 
 .form__button {
   background-color: white;
