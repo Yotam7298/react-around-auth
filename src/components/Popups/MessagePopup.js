@@ -2,8 +2,6 @@ import React from "react";
 import success from "../../images/success.svg";
 import failure from "../../images/failure.svg";
 
-const imageSrc = require(`../../images/success.svg`);
-
 export default function MessagePopup(props) {
   return (
     <div

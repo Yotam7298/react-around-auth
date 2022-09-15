@@ -36,7 +36,7 @@ export default function AuthorizeForm(props) {
             {props.formTitle}
           </button>
         </fieldset>
-        <a href="#" className="authorize__redirect">
+        <a href={props.redirectPath} className="authorize__redirect">
           {props.redirectText}
         </a>
       </form>

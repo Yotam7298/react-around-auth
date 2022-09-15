@@ -1,6 +1,6 @@
 //React imports
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 //Components Imports
 import Header from "./Header";
 import SignUp from "./Authorization/SignUp";
@@ -18,10 +18,12 @@ import MessagePopup from "./Popups/MessagePopup";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import CardsContext from "../contexts/CardsContext";
 import LoadingFormContext from "../contexts/LoadingFormContext";
+import LoggedInContext from "../contexts/LoggedInContext";
 //API import
 import api from "../utils/api";
 //CSS import
 import "../index.css";
+import ProtectedRoute from "./Authorization/ProtectedRoute";
 
 function App() {
   //STATE VARIABLES
@@ -31,13 +33,14 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
   const [isAddCardPopupOpen, setIsAddCardPopupOpen] = React.useState(false);
+  const [isMessagePopupOpen, setIsMessagePopupOpen] = React.useState(false);
   //Card selectors
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [deletedCard, setDeletedCard] = React.useState(null);
   //Server data
   const [cards, setCards] = React.useState([]);
   const [currentUser, setCurrentUser] = React.useState({});
-
+  const [isLoggedIn, setIsLoggedIn] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
 
   //FUNCTIONS
@@ -59,6 +62,7 @@ function App() {
     setIsAddCardPopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
+    setIsMessagePopupOpen(false);
     setSelectedCard(null);
     setDeletedCard(null);
   }
@@ -97,72 +101,82 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <CardsContext.Provider value={cards}>
         <LoadingFormContext.Provider value={isLoading}>
-          <Switch>
+          <LoggedInContext.Provider value={isLoggedIn}>
             <div className="page">
               {/* Main page content */}
-              <MessagePopup isMessageOpen={true} success={true} />
+              <MessagePopup isMessageOpen={isMessagePopupOpen} success={true} />
               <Header />
-              <Route path="/signup">
-                <SignUp />
-              </Route>
-              <Route path="/signin">
-                <SignIn />
-              </Route>
+              <Switch>
+                <Route path="/signup">
+                  <SignUp />
+                </Route>
+                <Route path="/signin">
+                  <SignIn />
+                </Route>
+                <ProtectedRoute path="/app">
+                  <Main
+                    onEditProfileClick={handleEditProfileClick}
+                    onAddPlaceClick={handleAddPlaceClick}
+                    onEditAvatarClick={handleEditAvatarClick}
+                    onCardClick={setSelectedCard}
+                    onCardDelete={setDeletedCard}
+                    updateCards={setCards}
+                    likeRequest={api.changeCardLike.bind(api)}
+                    cardsRequest={api.loadCards.bind(api)}
+                    requestError={api.reportError.bind(api)}
+                  />
+                  <Footer />
 
-              <Main
-                onEditProfileClick={handleEditProfileClick}
-                onAddPlaceClick={handleAddPlaceClick}
-                onEditAvatarClick={handleEditAvatarClick}
-                onCardClick={setSelectedCard}
-                onCardDelete={setDeletedCard}
-                updateCards={setCards}
-                likeRequest={api.changeCardLike.bind(api)}
-                cardsRequest={api.loadCards.bind(api)}
-                requestError={api.reportError.bind(api)}
-              />
-              <Footer />
-
-              {/* Popups */}
-              <EditProfilePopup
-                isOpen={isEditProfilePopupOpen}
-                onClose={closeAllPopups}
-                updateUser={setCurrentUser}
-                setLoadingState={setIsLoading}
-                submitRequest={api.editProfileInfo.bind(api)}
-                requestError={api.reportError.bind(api)}
-              />
-              <EditAvatarPopup
-                isOpen={isEditAvatarPopupOpen}
-                onClose={closeAllPopups}
-                updateUser={setCurrentUser}
-                updateCards={setCards}
-                setLoadingState={setIsLoading}
-                submitRequest={api.editProfileAvatar.bind(api)}
-                requestError={api.reportError.bind(api)}
-              />
-              <AddCardPopup
-                isOpen={isAddCardPopupOpen}
-                onClose={closeAllPopups}
-                updateCards={setCards}
-                setLoadingState={setIsLoading}
-                submitRequest={api.addNewCard.bind(api)}
-                requestError={api.reportError.bind(api)}
-              />
-              <DeleteCardPopup
-                deletedCard={deletedCard}
-                onClose={closeAllPopups}
-                updateCards={setCards}
-                setLoadingState={setIsLoading}
-                submitRequest={api.deleteCard.bind(api)}
-                requestError={api.reportError.bind(api)}
-              />
-              <ImagePopup
-                name="image"
-                card={selectedCard}
-                onClose={closeAllPopups}
-              />
+                  {/* Popups */}
+                  <EditProfilePopup
+                    isOpen={isEditProfilePopupOpen}
+                    onClose={closeAllPopups}
+                    updateUser={setCurrentUser}
+                    setLoadingState={setIsLoading}
+                    submitRequest={api.editProfileInfo.bind(api)}
+                    requestError={api.reportError.bind(api)}
+                  />
+                  <EditAvatarPopup
+                    isOpen={isEditAvatarPopupOpen}
+                    onClose={closeAllPopups}
+                    updateUser={setCurrentUser}
+                    updateCards={setCards}
+                    setLoadingState={setIsLoading}
+                    submitRequest={api.editProfileAvatar.bind(api)}
+                    requestError={api.reportError.bind(api)}
+                  />
+                  <AddCardPopup
+                    isOpen={isAddCardPopupOpen}
+                    onClose={closeAllPopups}
+                    updateCards={setCards}
+                    setLoadingState={setIsLoading}
+                    submitRequest={api.addNewCard.bind(api)}
+                    requestError={api.reportError.bind(api)}
+                  />
+                  <DeleteCardPopup
+                    deletedCard={deletedCard}
+                    onClose={closeAllPopups}
+                    updateCards={setCards}
+                    setLoadingState={setIsLoading}
+                    submitRequest={api.deleteCard.bind(api)}
+                    requestError={api.reportError.bind(api)}
+                  />
+                  <ImagePopup
+                    name="image"
+                    card={selectedCard}
+                    onClose={closeAllPopups}
+                  />
+                </ProtectedRoute>
+                <Route path="/">
+                  {isLoggedIn ? (
+                    <Redirect to="/app" />
+                  ) : (
+                    <Redirect to="/signin" />
+                  )}
+                </Route>
+              </Switch>
             </div>
-          </Switch>
+          </LoggedInContext.Provider>
         </LoadingFormContext.Provider>
       </CardsContext.Provider>
     </CurrentUserContext.Provider>
