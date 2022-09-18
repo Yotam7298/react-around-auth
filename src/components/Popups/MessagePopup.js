@@ -8,10 +8,17 @@ export default function MessagePopup(props) {
       className={`message-popup popup ${
         props.isMessageOpen ? "popup_opened" : ""
       }`}
+      onClick={props.onClose}
     >
-      <div className="popup__container">
+      <div
+        className="popup__container"
+        onClick={(evt) => evt.stopPropagation()}
+      >
         <div className="popup__message-container">
-          <button className="popup__close-button"></button>
+          <button
+            onClick={props.onClose}
+            className="popup__close-button"
+          ></button>
           <img
             src={`${props.success ? success : failure}`}
             alt={`${
@@ -24,7 +31,7 @@ export default function MessagePopup(props) {
           <h2 className="popup__message">
             {props.success
               ? "Success! You have now been registered"
-              : "failure"}
+              : "Oops, something went wrong! Please try again."}
           </h2>
         </div>
       </div>

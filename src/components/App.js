@@ -1,6 +1,6 @@
 //React imports
 import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 //Components Imports
 import Header from "./Header";
 import SignUp from "./Authorization/SignUp";
@@ -21,11 +21,13 @@ import LoadingFormContext from "../contexts/LoadingFormContext";
 import LoggedInContext from "../contexts/LoggedInContext";
 //API import
 import api from "../utils/api";
+import auth from "../utils/auth";
 //CSS import
 import "../index.css";
 import ProtectedRoute from "./Authorization/ProtectedRoute";
 
 function App() {
+  const history = useHistory();
   //STATE VARIABLES
   //Popups toggles
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
@@ -34,13 +36,15 @@ function App() {
     React.useState(false);
   const [isAddCardPopupOpen, setIsAddCardPopupOpen] = React.useState(false);
   const [isMessagePopupOpen, setIsMessagePopupOpen] = React.useState(false);
+  const [isMessagePopupSuccess, setIsMessagePopupSuccess] =
+    React.useState(false);
   //Card selectors
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [deletedCard, setDeletedCard] = React.useState(null);
   //Server data
   const [cards, setCards] = React.useState([]);
   const [currentUser, setCurrentUser] = React.useState({});
-  const [isLoggedIn, setIsLoggedIn] = React.useState(true);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
   //FUNCTIONS
@@ -67,7 +71,33 @@ function App() {
     setDeletedCard(null);
   }
 
-  //Popup submit handlers
+  React.useEffect(() => {
+    if (localStorage.getItem("jwt")) {
+      const jwt = localStorage.getItem("jwt");
+      auth
+        .getMyInfo(jwt)
+        .then((res) => {
+          setCurrentUser({ ...currentUser, email: res.email });
+          setIsLoggedIn(true);
+        })
+        .then(() => history.push("/app"))
+        .catch((errStatus) => {
+          switch (errStatus) {
+            case 400:
+              console.log(
+                `Error 400 - Token not provided or provided in the wrong format`
+              );
+              break;
+            case 401:
+              console.log(`Error 401 - The provided token is invalid`);
+              break;
+            default:
+              console.log(`Error 500 - Something went wrong with the server`);
+              break;
+          }
+        });
+    }
+  }, []);
 
   React.useEffect(() => {
     api
@@ -104,14 +134,25 @@ function App() {
           <LoggedInContext.Provider value={isLoggedIn}>
             <div className="page">
               {/* Main page content */}
-              <MessagePopup isMessageOpen={isMessagePopupOpen} success={true} />
-              <Header />
+              <MessagePopup
+                isMessageOpen={isMessagePopupOpen}
+                success={isMessagePopupSuccess}
+                onClose={closeAllPopups}
+              />
+              <Header setIsLoggedIn={setIsLoggedIn} />
               <Switch>
                 <Route path="/signup">
-                  <SignUp />
+                  <SignUp
+                    submitRequest={auth.signUpUser.bind(auth)}
+                    openMessagePopup={setIsMessagePopupOpen}
+                    setIsMessagePopupSuccess={setIsMessagePopupSuccess}
+                  />
                 </Route>
                 <Route path="/signin">
-                  <SignIn />
+                  <SignIn
+                    submitRequest={auth.signInUser.bind(auth)}
+                    setIsLoggedIn={setIsLoggedIn}
+                  />
                 </Route>
                 <ProtectedRoute path="/app">
                   <Main

@@ -1,11 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useHistory } from "react-router-dom";
 import aroundLogoPath from "../images/around-logo.svg";
+import CurrentUserContext from "../contexts/CurrentUserContext";
 import LoggedInContext from "../contexts/LoggedInContext";
 
-export default function Header() {
+export default function Header(props) {
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const currentUser = React.useContext(CurrentUserContext);
   const isLoggedIn = React.useContext(LoggedInContext);
+  const history = useHistory();
+
+  function signOut() {
+    props.setIsLoggedIn(false);
+    localStorage.removeItem("jwt");
+    history.push("/signin");
+  }
 
   function toggleDrawer() {
     setIsDrawerOpen(!isDrawerOpen);
@@ -15,7 +25,7 @@ export default function Header() {
     setScreenWidth(window.innerWidth);
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     window.addEventListener("resize", getScreenWidth);
     return () => window.removeEventListener("resize", getScreenWidth);
   });
@@ -34,7 +44,7 @@ export default function Header() {
       break;
     default:
       headerPath = {
-        email: "email@email.com",
+        email: currentUser.email,
         link: "/signin",
         text: "Sign Out",
       };
@@ -61,12 +71,12 @@ export default function Header() {
           screenWidth > 600 ? (
             <div className="header__container">
               <p className="header__email">{headerPath.email}</p>
-              <a
-                href={headerPath.link}
+              <button
+                onClick={signOut}
                 className="header__button header__button_logged"
               >
                 {headerPath.text}
-              </a>
+              </button>
             </div>
           ) : (
             <button onClick={toggleDrawer} className="header__drawer-icon">
