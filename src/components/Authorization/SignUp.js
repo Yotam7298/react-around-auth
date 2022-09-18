@@ -1,27 +1,19 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import AuthorizeForm from "./AuthorizeForm";
 
 export default function SignUp(props) {
+  const history = useHistory();
   function handleSubmit(values) {
     props
       .submitRequest(values)
       .then(() => {
         props.openMessagePopup(true);
         props.setMessagePopupSuccess(true);
+        history.push("/signin");
       })
-      .catch((errStatus) => {
-        console.log((errStatus) => {
-          switch (errStatus) {
-            case 400:
-              console.log(
-                `Error 400 - One of the fields was filled in incorrectly`
-              );
-              break;
-            default:
-              console.log(`Error 500 - Something went wwrong with the server`);
-              break;
-          }
-        });
+      .catch((err) => {
+        props.authErrorReport(err);
         props.openMessagePopup(true);
         props.setIsMessagePopupSuccess(false);
       });

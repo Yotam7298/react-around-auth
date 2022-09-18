@@ -13,21 +13,8 @@ export default function SignIn(props) {
         props.setIsLoggedIn(true);
         history.push("/app");
       })
-      .catch((errStatus) => {
-        switch (errStatus) {
-          case 400:
-            console.log(
-              `Error 400 - One or more of the fields were not provided`
-            );
-            break;
-          case 401:
-            console.log(
-              `Error 401 - The user with the specified email not found`
-            );
-          default:
-            console.log(`Error 500 - Something went wrong with the server`);
-            break;
-        }
+      .catch((err) => {
+        props.authErrorReport(err);
       });
   }
 

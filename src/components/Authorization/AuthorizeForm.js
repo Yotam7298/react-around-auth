@@ -7,7 +7,6 @@ export default function AuthorizeForm(props) {
   function submitForm(evt) {
     evt.preventDefault();
     props.handleSubmit({ email: values.email, password: values.password });
-    console.log(values);
   }
 
   return (

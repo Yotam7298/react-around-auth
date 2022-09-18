@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
 export default function useFormValidation() {
   const [values, setValues] = useState({});
@@ -7,7 +7,6 @@ export default function useFormValidation() {
 
   const handleChange = (evt) => {
     const { name, value } = evt.target;
-    console.log(values);
     setValues({ ...values, [name]: value });
     setErrors({ ...errors, [name]: evt.target.validationMessage });
     setIsValid(evt.target.closest("form").checkValidity());

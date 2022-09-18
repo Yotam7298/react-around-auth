@@ -81,21 +81,7 @@ function App() {
           setIsLoggedIn(true);
         })
         .then(() => history.push("/app"))
-        .catch((errStatus) => {
-          switch (errStatus) {
-            case 400:
-              console.log(
-                `Error 400 - Token not provided or provided in the wrong format`
-              );
-              break;
-            case 401:
-              console.log(`Error 401 - The provided token is invalid`);
-              break;
-            default:
-              console.log(`Error 500 - Something went wrong with the server`);
-              break;
-          }
-        });
+        .catch((err) => auth.reportError(err));
     }
   }, []);
 
@@ -144,6 +130,7 @@ function App() {
                 <Route path="/signup">
                   <SignUp
                     submitRequest={auth.signUpUser.bind(auth)}
+                    authErrorReport={auth.reportError.bind(auth)}
                     openMessagePopup={setIsMessagePopupOpen}
                     setIsMessagePopupSuccess={setIsMessagePopupSuccess}
                   />
@@ -151,6 +138,7 @@ function App() {
                 <Route path="/signin">
                   <SignIn
                     submitRequest={auth.signInUser.bind(auth)}
+                    authErrorReport={auth.reportError.bind(auth)}
                     setIsLoggedIn={setIsLoggedIn}
                   />
                 </Route>

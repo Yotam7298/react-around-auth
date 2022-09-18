@@ -5,14 +5,21 @@ class Auth {
 
   _verifyResponse(res) {
     if (res.ok) {
+      console.log("Request was successful:");
+      console.log(res);
       return res.json();
     }
-    return Promise.reject(res.status);
+    return Promise.reject(res);
   }
 
-  _logInfo(res) {
-    console.log("Request was successful:");
-    console.log(res);
+  _logInfo(res) {}
+
+  reportError(err) {
+    if (err.constructor === Response) {
+      err.json().then((data) => console.log(`${err.status} - ${data.message}`));
+    } else {
+      console.log(err);
+    }
   }
 
   signUpUser({ email, password }) {
@@ -20,8 +27,8 @@ class Auth {
       method: "POST",
       headers: this._options.headers,
       body: JSON.stringify({
-        password: password,
-        email: email,
+        password,
+        email,
       }),
     })
       .then(this._verifyResponse)
