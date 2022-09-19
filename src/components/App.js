@@ -44,6 +44,7 @@ function App() {
   //Server data
   const [cards, setCards] = React.useState([]);
   const [currentUser, setCurrentUser] = React.useState({});
+  const [email, setEmail] = React.useState("");
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -71,19 +72,73 @@ function App() {
     setDeletedCard(null);
   }
 
-  React.useEffect(() => {
-    if (localStorage.getItem("jwt")) {
-      const jwt = localStorage.getItem("jwt");
-      auth
-        .getMyInfo(jwt)
-        .then((res) => {
-          setCurrentUser({ ...currentUser, email: res.email });
-          setIsLoggedIn(true);
-        })
-        .then(() => history.push("/app"))
-        .catch((err) => auth.reportError(err));
-    }
-  }, []);
+  //Submits
+  function addCardSubmit(input) {
+    api
+      .addNewCard(input)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => api.reportError(err))
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  function deleteCardSubmit() {
+    api
+      .deleteCard(deletedCard._id)
+      .then(() => {
+        setCards(cards.filter((card) => card._id !== deletedCard._id));
+        closeAllPopups();
+      })
+      .catch((err) => api.reportError(err))
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  function editAvatarSubmit(avatar) {
+    api
+      .editProfileAvatar(avatar)
+      .then((userInfo) => {
+        setCurrentUser({ ...currentUser, avatar: userInfo.avatar });
+        closeAllPopups();
+      })
+      .catch((err) => api.reportError(err))
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  function editProfileSubmit(input) {
+    api
+      .editProfileInfo(input)
+      .then((userInfo) => {
+        setCurrentUser({
+          ...currentUser,
+          name: userInfo.name,
+          about: userInfo.about,
+        });
+        closeAllPopups();
+      })
+      .catch((err) => api.reportError(err))
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  function handleLike(cardId, method) {
+    api
+      .changeCardLike(cardId, method)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((card) => (card._id === newCard._id ? newCard : card))
+        );
+      })
+      .catch((err) => api.reportError(err));
+  }
 
   React.useEffect(() => {
     api
@@ -99,6 +154,23 @@ function App() {
         setCards(cards);
       })
       .catch((err) => api.reportError(err));
+  }, []);
+
+  React.useEffect(() => {
+    if (localStorage.getItem("jwt")) {
+      const jwt = localStorage.getItem("jwt");
+      auth
+        .getMyInfo(jwt)
+        .then((res) => {
+          setEmail(res.data.email);
+          setIsLoggedIn(true);
+        })
+        .then(() => {
+          history.push("/app");
+          console.log(email);
+        })
+        .catch((err) => auth.reportError(err));
+    }
   }, []);
 
   React.useEffect(() => {
@@ -125,7 +197,7 @@ function App() {
                 success={isMessagePopupSuccess}
                 onClose={closeAllPopups}
               />
-              <Header setIsLoggedIn={setIsLoggedIn} />
+              <Header setIsLoggedIn={setIsLoggedIn} email={email} />
               <Switch>
                 <Route path="/signup">
                   <SignUp
@@ -140,6 +212,7 @@ function App() {
                     submitRequest={auth.signInUser.bind(auth)}
                     authErrorReport={auth.reportError.bind(auth)}
                     setIsLoggedIn={setIsLoggedIn}
+                    setEmail={setEmail}
                   />
                 </Route>
                 <ProtectedRoute path="/app">
@@ -149,10 +222,7 @@ function App() {
                     onEditAvatarClick={handleEditAvatarClick}
                     onCardClick={setSelectedCard}
                     onCardDelete={setDeletedCard}
-                    updateCards={setCards}
-                    likeRequest={api.changeCardLike.bind(api)}
-                    cardsRequest={api.loadCards.bind(api)}
-                    requestError={api.reportError.bind(api)}
+                    handleLike={handleLike}
                   />
                   <Footer />
 
@@ -160,35 +230,26 @@ function App() {
                   <EditProfilePopup
                     isOpen={isEditProfilePopupOpen}
                     onClose={closeAllPopups}
-                    updateUser={setCurrentUser}
                     setLoadingState={setIsLoading}
-                    submitRequest={api.editProfileInfo.bind(api)}
-                    requestError={api.reportError.bind(api)}
+                    formSubmit={editProfileSubmit}
                   />
                   <EditAvatarPopup
                     isOpen={isEditAvatarPopupOpen}
                     onClose={closeAllPopups}
-                    updateUser={setCurrentUser}
-                    updateCards={setCards}
                     setLoadingState={setIsLoading}
-                    submitRequest={api.editProfileAvatar.bind(api)}
-                    requestError={api.reportError.bind(api)}
+                    formSubmit={editAvatarSubmit}
                   />
                   <AddCardPopup
                     isOpen={isAddCardPopupOpen}
-                    onClose={closeAllPopups}
-                    updateCards={setCards}
                     setLoadingState={setIsLoading}
-                    submitRequest={api.addNewCard.bind(api)}
-                    requestError={api.reportError.bind(api)}
+                    onClose={closeAllPopups}
+                    formSubmit={addCardSubmit}
                   />
                   <DeleteCardPopup
                     deletedCard={deletedCard}
                     onClose={closeAllPopups}
-                    updateCards={setCards}
                     setLoadingState={setIsLoading}
-                    submitRequest={api.deleteCard.bind(api)}
-                    requestError={api.reportError.bind(api)}
+                    formSubmit={deleteCardSubmit}
                   />
                   <ImagePopup
                     name="image"

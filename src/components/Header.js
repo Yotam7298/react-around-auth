@@ -1,14 +1,10 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { Switch, Route, Link, useHistory } from "react-router-dom";
 import aroundLogoPath from "../images/around-logo.svg";
-import CurrentUserContext from "../contexts/CurrentUserContext";
-import LoggedInContext from "../contexts/LoggedInContext";
 
 export default function Header(props) {
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
-  const currentUser = React.useContext(CurrentUserContext);
-  const isLoggedIn = React.useContext(LoggedInContext);
   const history = useHistory();
 
   function signOut() {
@@ -23,6 +19,9 @@ export default function Header(props) {
 
   function getScreenWidth() {
     setScreenWidth(window.innerWidth);
+    if (screenWidth >= 750) {
+      setIsDrawerOpen(false);
+    }
   }
 
   React.useEffect(() => {
@@ -30,67 +29,76 @@ export default function Header(props) {
     return () => window.removeEventListener("resize", getScreenWidth);
   });
 
-  let headerPath = window.location.pathname;
-
-  switch (headerPath) {
-    case "/signin":
-      headerPath = {
-        link: "/signup",
-        text: "Sign Up",
-      };
-      break;
-    case "/signup":
-      headerPath = { link: "/signin", text: "Sign In" };
-      break;
-    default:
-      headerPath = {
-        email: currentUser.email,
-        link: "/signin",
-        text: "Sign Out",
-      };
-      break;
-  }
-
   return (
-    <header className="header">
-      {isDrawerOpen && (
-        <div className="header__drawer">
-          <p className="header__email">{headerPath.email}</p>
-          <a
-            href={headerPath.link}
-            className="header__button header__button_logged"
-          >
-            {headerPath.text}
-          </a>
-        </div>
-      )}
-      <div className="header__content">
-        <img src={aroundLogoPath} alt="Around the us logo" className="logo" />
-
-        {isLoggedIn ? (
-          screenWidth > 600 ? (
-            <div className="header__container">
-              <p className="header__email">{headerPath.email}</p>
+    <Switch>
+      <Route path="/signin">
+        <header className="header">
+          <div className="header__content">
+            <img
+              src={aroundLogoPath}
+              alt="Around the us logo"
+              className="logo"
+            />
+            <Link to="/signup" className="header__button">
+              Sign Up
+            </Link>
+          </div>
+        </header>
+      </Route>
+      <Route path="/signup">
+        <header className="header">
+          <div className="header__content">
+            <img
+              src={aroundLogoPath}
+              alt="Around the us logo"
+              className="logo"
+            />
+            <Link to="/signin" className="header__button">
+              Sign In
+            </Link>
+          </div>
+        </header>
+      </Route>
+      <Route path="/app">
+        <header className="header">
+          {isDrawerOpen && (
+            <div className="header__drawer">
+              <p className="header__email">{props.email}</p>
               <button
                 onClick={signOut}
                 className="header__button header__button_logged"
               >
-                {headerPath.text}
+                Sign Out
               </button>
             </div>
-          ) : (
-            <button onClick={toggleDrawer} className="header__drawer-icon">
-              <div className="header__drawer-line"></div>
-              <div className="header__drawer-line"></div>
-              <div className="header__drawer-line"></div>
-            </button>
-          )
-        ) : (
-          <a href={headerPath.link} className="header__button">
-            {headerPath.text}
-          </a>
-        )}
-      </div>
-    </header>
+          )}
+          <div className="header__content">
+            <img
+              src={aroundLogoPath}
+              alt="Around the us logo"
+              className="logo"
+            />
+
+            {screenWidth > 750 ? (
+              <div className="header__container">
+                <p className="header__email">{props.email}</p>
+                <button
+                  onClick={signOut}
+                  className="header__button header__button_logged"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button onClick={toggleDrawer} className="header__drawer-icon">
+                <div className="header__drawer-line"></div>
+                <div className="header__drawer-line"></div>
+                <div className="header__drawer-line"></div>
+              </button>
+            )}
+          </div>
+        </header>
+      </Route>
+    </Switch>
   );
 }

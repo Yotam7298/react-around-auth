@@ -8,15 +8,14 @@ export default function SignUp(props) {
     props
       .submitRequest(values)
       .then(() => {
-        props.openMessagePopup(true);
         props.setMessagePopupSuccess(true);
         history.push("/signin");
       })
       .catch((err) => {
         props.authErrorReport(err);
-        props.openMessagePopup(true);
         props.setIsMessagePopupSuccess(false);
-      });
+      })
+      .finally(() => props.openMessagePopup(true));
   }
 
   return (

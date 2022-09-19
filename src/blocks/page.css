@@ -1,5 +1,7 @@
 .page {
   background-color: black;
+  min-height: 100vh;
+  height: 100%;
   padding: calc(28px + 17 * ((100vw - 320px) / 960))
     calc(19px + 181 * ((100vw - 320px) / 960))
     calc(36px + 24 * ((100vw - 320px) / 960));

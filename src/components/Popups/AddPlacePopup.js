@@ -14,16 +14,7 @@ export default function AddCardPopup(props) {
     evt.preventDefault();
     props.setLoadingState(true);
 
-    props
-      .submitRequest({ title: values.title, link: values.link })
-      .then((newCard) => {
-        props.updateCards([newCard, ...cards]);
-        props.onClose();
-      })
-      .catch((err) => props.requestError(err))
-      .finally(() => {
-        props.setLoadingState(false);
-      });
+    props.formSubmit({ title: values.title, link: values.link });
   }
 
   React.useEffect(() => {

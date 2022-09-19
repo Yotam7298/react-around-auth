@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import useFormValidation from "../../hooks/formValidatorHook";
 
 export default function AuthorizeForm(props) {
@@ -51,9 +52,9 @@ export default function AuthorizeForm(props) {
             {props.formTitle}
           </button>
         </fieldset>
-        <a href={props.redirectPath} className="authorize__redirect">
+        <Link to={props.redirectPath} className="authorize__redirect">
           {props.redirectText}
-        </a>
+        </Link>
       </form>
     </div>
   );

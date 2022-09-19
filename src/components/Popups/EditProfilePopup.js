@@ -17,27 +17,13 @@ export default function EditProfilePopup(props) {
     resetForm,
   } = useFormValidation();
 
-  function handleSubmit(evt) {
+  function submitEditProfileForm(evt) {
     evt.preventDefault();
     props.setLoadingState(true);
-
-    props
-      .submitRequest({
-        name: values.name,
-        about: values.about,
-      })
-      .then((userInfo) => {
-        props.updateUser({
-          ...currentUser,
-          name: userInfo.name,
-          about: userInfo.about,
-        });
-        props.onClose();
-      })
-      .catch((err) => props.requestError(err))
-      .finally(() => {
-        props.setLoadingState(false);
-      });
+    props.formSubmit({
+      name: values.name,
+      about: values.about,
+    });
   }
 
   React.useEffect(() => {
@@ -52,7 +38,7 @@ export default function EditProfilePopup(props) {
       title="Edit Profile"
       isOpen={props.isOpen}
       onClose={props.onClose}
-      onSubmit={handleSubmit}
+      onSubmit={submitEditProfileForm}
       isFormValid={isValid}
       submitText={isLoading ? "Saving..." : "Save"}
     >

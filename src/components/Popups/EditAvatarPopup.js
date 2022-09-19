@@ -1,11 +1,9 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
-import CurrentUserContext from "../../contexts/CurrentUserContext";
 import LoadingFormContext from "../../contexts/LoadingFormContext";
 import useFormValidation from "../../hooks/formValidatorHook";
 
 export default function EditAvatarPopup(props) {
-  const currentUser = React.useContext(CurrentUserContext);
   const isLoading = React.useContext(LoadingFormContext);
   const { values, handleChange, errors, isValid, resetForm } =
     useFormValidation();
@@ -14,16 +12,7 @@ export default function EditAvatarPopup(props) {
     evt.preventDefault();
     props.setLoadingState(true);
 
-    props
-      .submitRequest(values.avatar)
-      .then((userInfo) => {
-        props.updateUser({ ...currentUser, avatar: userInfo.avatar });
-        props.onClose();
-      })
-      .catch((err) => props.requestError(err))
-      .finally(() => {
-        props.setLoadingState(false);
-      });
+    props.formSubmit(values.avatar);
   }
 
   React.useEffect(() => {

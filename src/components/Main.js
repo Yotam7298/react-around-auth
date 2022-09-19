@@ -7,17 +7,6 @@ export default function Main(props) {
   const currentUser = React.useContext(CurrentUserContext);
   const cards = React.useContext(CardsContext);
 
-  function handleLikeClick(cardId, method) {
-    props
-      .likeRequest(cardId, method)
-      .then((newCard) => {
-        props.updateCards((state) =>
-          state.map((card) => (card._id === newCard._id ? newCard : card))
-        );
-      })
-      .catch((err) => props.requestError(err));
-  }
-
   return (
     <main className="content">
       <section className="profile">
@@ -65,7 +54,7 @@ export default function Main(props) {
                   card={card}
                   onCardClick={props.onCardClick}
                   onCardDelete={props.onCardDelete}
-                  onLikeClick={handleLikeClick}
+                  onLikeClick={props.handleLike}
                 />
               );
             })}
