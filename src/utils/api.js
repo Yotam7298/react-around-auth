@@ -7,8 +7,7 @@ class Api {
     if (res.ok) {
       return res.json();
     }
-    let err;
-    return Promise.reject(err);
+    return Promise.reject(res);
   }
 
   reportError(err) {
@@ -20,6 +19,27 @@ class Api {
     console.log(res);
   }
 
+  _request(endPoint, method, body) {
+    return fetch(`${this._options.baseUrl + endPoint}`, {
+      method: method,
+      headers: this._options.headers,
+      body: JSON.stringify(body),
+    })
+      .then(this._verifyResponse)
+      .then((res) => {
+        this._logInfo(res);
+        return res;
+      });
+  }
+
+  getUserInfo() {
+    return this._request("/users/me", "GET");
+  }
+
+  loadCards() {
+    return this._request("/cards", "GET");
+  }
+
   getAllInfo() {
     return Promise.all([this.getUserInfo(), this.loadCards()]).then(
       (values) => {
@@ -28,96 +48,30 @@ class Api {
     );
   }
 
-  getUserInfo() {
-    return fetch(`${this._options.baseUrl}/users/me`, {
-      headers: this._options.headers,
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-        return res;
-      });
-  }
-
-  loadCards() {
-    return fetch(`${this._options.baseUrl}/cards`, {
-      headers: this._options.headers,
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-        return res;
-      });
-  }
-
   editProfileInfo(userNewInfo) {
-    return fetch(`${this._options.baseUrl}/users/me`, {
-      method: "PATCH",
-      headers: this._options.headers,
-      body: JSON.stringify({
-        name: userNewInfo.name,
-        about: userNewInfo.about,
-      }),
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-        return res;
-      });
+    return this._request("/users/me", "PATCH", {
+      name: userNewInfo.name,
+      about: userNewInfo.about,
+    });
   }
 
   editProfileAvatar(avatarUrl) {
-    return fetch(`${this._options.baseUrl}/users/me/avatar`, {
-      method: "PATCH",
-      headers: this._options.headers,
-      body: JSON.stringify({
-        avatar: avatarUrl,
-      }),
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-        return res;
-      });
+    return this._request("/users/me/avatar", "PATCH", { avatar: avatarUrl });
   }
 
   addNewCard(cardNewInfo) {
-    return fetch(`${this._options.baseUrl}/cards`, {
-      method: "POST",
-      headers: this._options.headers,
-      body: JSON.stringify({
-        name: cardNewInfo.title,
-        link: cardNewInfo.link,
-      }),
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-        return res;
-      });
+    return this._request("/cards", "POST", {
+      name: cardNewInfo.title,
+      link: cardNewInfo.link,
+    });
   }
 
   deleteCard(cardId) {
-    return fetch(`${this._options.baseUrl}/cards/${cardId}`, {
-      method: "DELETE",
-      headers: this._options.headers,
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-      });
+    return this._request(`/cards/${cardId}`, "DELETE");
   }
 
   changeCardLike(cardId, method) {
-    return fetch(`${this._options.baseUrl}/cards/likes/${cardId}`, {
-      method: method,
-      headers: this._options.headers,
-    })
-      .then(this._verifyResponse)
-      .then((res) => {
-        this._logInfo(res);
-        return res;
-      });
+    return this._request(`/cards/likes/${cardId}`, method);
   }
 }
 
